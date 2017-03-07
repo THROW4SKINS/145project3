@@ -1,40 +1,42 @@
 
-
-nbytes <- function(drname,filelist,arg){
-  dirname = drname
+nbytes <- function(drname,filelist,arg,firstcall){
+  if (firstcall == TRUE){
+    arg <<- sum(file.info(list.files(drname, full.names = TRUE))$size)
+  }
   for (f in filelist){
-    arg = arg + file.info(f)$size
+    arg = arg +  sum(file.info(list.files(drname, full.names = TRUE))$size)
   }
   
-  return (arg)
+    print (arg)
   
 }
 
-rmemptydirs <- function(drname,filelist){
-  for (f in 1:length(filelist)){
-    folder_size=sum(file.info(list.files(filelist[f], all.files = TRUE, recursive = TRUE))$size)
-     if (folder_size == 0 ){
-        unlink(filelist[f],recursive = T)
+rmemptydirs <- function(drname,filelist,arg,firstcall){
+  for (i in filelist){
+     print (i)
+     fs=sum(file.info(list.files(i, full.names = TRUE))$size)
+     print (fs)
+     if (fs == 0 ){
+        unlink(i,recursive = T)
      }
   }
   
 }
 
-walk <- function(currdir,f,first){
-  if (first ==T) {
-    droot <- currdir
-  }
-  dirlist <- dir(currdir,full.names = T)[file.info(dir(currdir,all.files = FALSE,full.names=T))$isdir]
-  f(currdir,dirlist)
-  dirlist <- dir(currdir,full.names = T)[file.info(dir(currdir,all.files = FALSE,full.names=T))$isdir]
-  for (i in 1:length(dirlist))
-  {
-    walk(dirlist[i],f,FALSE)
-    
-  }
-  
-  setwd(droot)
+walk <- function(currdir,f,arg,firstcall = TRUE){
+    if (firstcall ==T) {
+      droot <<- currdir
+    }
+    dirlist <- list.dirs(path = currdir, full.names = TRUE)
+    f(currdir,dirlist,arg,firstcall)
+    for (i in dirlist)
+      {
+        walk(i,f,arg,first = FALSE)
+        
+      }
+    setwd(droot)
+
 }
 
-walk(getwd(),rmemptydirs,first = T)
+walk(getwd(),rmemptydirs,NA,TRUE)
 getwd()
