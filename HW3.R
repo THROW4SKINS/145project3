@@ -40,8 +40,8 @@ secretencoder <- function(imgfilename, msg, startpix, stride, consec = NULL){
   if(ifnotprime(stride)){
     warning("Stride is not a prime number. Recommended prime number")
   }
-  #tryCatch(read.pnm(imgfilename),error={print("File does not exist")})
-  org_img <- read.pnm(imgfilename)
+  tryCatch(org_img <- read.pnm(imgfilename),error=function(e){stop("File does not exist")})
+  #org_img <- read.pnm(imgfilename)
   grey_img <- org_img@grey
   img_len = length(grey_img)
   d_img = dim(grey_img)
@@ -49,6 +49,9 @@ secretencoder <- function(imgfilename, msg, startpix, stride, consec = NULL){
   msg_code = append(msg_code, 0)
   msg_code = msg_code/128
   msg_code_len = length(msg_code)
+  if(msg_code_len > img_len){
+    stop("Insufficient room for the message.")
+  }
   if(is.null(consec)){
     grey_pos = seq(startpix, msg_code_len*stride + startpix - 1, stride)
     while(any(grey_pos > img_len)){
@@ -84,9 +87,8 @@ secretencoder <- function(imgfilename, msg, startpix, stride, consec = NULL){
       }
       if(posit > img_len){
         posit = posit - img_len
-        looper = looper + 1
       }
-      if(looper == 2){
+      if(sum(row_check) > (length(row_check)*consec) || sum(col_check) > (length(col_check)*consec)){
         stop("Insufficient room for the message.")
       }
     }
@@ -103,8 +105,8 @@ secretencoder <- function(imgfilename, msg, startpix, stride, consec = NULL){
 
 
 secretdecoder <- function(imgfilename,startpix,stride,consec=NULL){
-  #msg_img = read.pnm(imgfilename)
-  msg_img = imgfilename
+  msg_img = read.pnm(imgfilename)
+  #msg_img = imgfilename
   msg = vector()
   grey_img <- msg_img@grey
   d_img = dim(grey_img)
@@ -151,7 +153,7 @@ secretdecoder <- function(imgfilename,startpix,stride,consec=NULL){
       }
     }
   }
-  msg_str = intToUtf8((msg*128))
+  msg_str = intToUtf8(round(msg*128))
   return(msg_str)
 }
 
