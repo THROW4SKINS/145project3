@@ -83,8 +83,8 @@ secretencoder <- function(imgfilename, msg, startpix, stride, consec = NULL){
     while(counter <= msg_code_len){
       #Check if the rows and columns are less than consec. If it is, we pass, if not, we add in!
       if(c_check(posit, row_check, col_check, d_img, consec)){
-        row_check[floor(posit/d_img[2])] = row_check[floor(posit/d_img[2]) + 1] + 1
-        col_check[floor(posit/d_img[1])] = col_check[floor(posit/d_img[1]) + 1] + 1
+        row_check[floor(posit/d_img[2])+1] = row_check[floor(posit/d_img[2])+1] + 1
+        col_check[floor(posit/d_img[1])+1] = col_check[floor(posit/d_img[1])+1] + 1
         grey_pos[counter] = posit
         posit = posit + stride
         counter = counter + 1
@@ -145,8 +145,8 @@ secretdecoder <- function(imgfilename,startpix,stride,consec=NULL){
       }
       #Get our position. Same idea as the encoder, our positions will have to meet up consec requirement
       if(c_check(posit, row_check, col_check, d_img, consec)){
-        row_check[floor(posit/d_img[2])] = row_check[floor(posit/d_img[2]) + 1] + 1
-        col_check[floor(posit/d_img[1])] = col_check[floor(posit/d_img[1]) + 1] + 1
+        row_check[floor(posit/d_img[2])+1] = row_check[floor(posit/d_img[2])+1] + 1
+        col_check[floor(posit/d_img[1])+1] = col_check[floor(posit/d_img[1])+1] + 1
         num = grey_img[posit]
         if(num == 0){
           counter = 1
